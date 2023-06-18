@@ -10,6 +10,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestBase {
     /*
@@ -81,6 +83,19 @@ public class TestBase {
 
         Select select = new Select(ddm);
         select.selectByValue(value);
+    }
+
+    //SwitchTo Window-1
+    public void switchToWindow1(int index){
+        List<String> pebcereler = new ArrayList<>(driver.getWindowHandles());
+        driver.switchTo().window(pebcereler.get(index));
+
+    }
+
+    //SwitchTo Window-2
+    public void switchToWindow2(int index){
+        driver.switchTo().window(driver.getWindowHandles().toArray()[index].toString());
+
     }
 
 
