@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -57,7 +58,7 @@ public class TestBase {
     }
 
     //visibilityOfElement(locaotor) methodu
-    public void visibleWait(By locator, int saniye){
+    public void visibleWaitLocator(By locator, int saniye){
 
         WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(saniye));
         wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
@@ -69,6 +70,14 @@ public class TestBase {
 
         WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(saniye));
         wait.until(ExpectedConditions.alertIsPresent());
+
+    }
+
+    //FluentWait visible Methodu
+    public void visibleFluentWait(WebElement element,int saniye,int milisaniye){
+        new FluentWait<>(driver).withTimeout(Duration.ofSeconds(saniye)).
+                pollingEvery(Duration.ofMillis(milisaniye)).
+                until(ExpectedConditions.visibilityOf(element));
 
     }
 
