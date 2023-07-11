@@ -1,11 +1,10 @@
 package techproed.utilities;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -13,8 +12,12 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TestBase {
@@ -126,8 +129,8 @@ public class TestBase {
 
     //SwitchTo Window-1
     public void switchToWindow1(int index){
-        List<String> pebcereler = new ArrayList<>(driver.getWindowHandles());
-        driver.switchTo().window(pebcereler.get(index));
+        List<String> pencereler = new ArrayList<>(driver.getWindowHandles());
+        driver.switchTo().window(pencereler.get(index));
 
     }
 
@@ -135,6 +138,31 @@ public class TestBase {
     public void switchToWindow2(int index){
         driver.switchTo().window(driver.getWindowHandles().toArray()[index].toString());
 
+    }
+
+    //Tüm Sayfa Resmi(ScreenShot)
+    public void tumSayfaResmi(){
+
+        String tarih = new SimpleDateFormat("_hh_mm_ss_ddMMyyyy").format(new Date());
+        String dosyaYolu = "src/test/java/techproed/TumSayfaResmi/screenShot" + tarih + ".jpeg";
+        TakesScreenshot ts = (TakesScreenshot) driver;
+        try {
+            FileUtils.copyFile(ts.getScreenshotAs(OutputType.FILE),new File(dosyaYolu));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //Webelement Resmi(Webelement ScreenShot)
+    public void webelementResmi(WebElement element){
+
+        String tarih = new SimpleDateFormat("_hh_mm_ss_ddMMyyyy").format(new Date());
+        String dosyaYolu = "src/test/java/techproed/ElementResmi/WEscreenShot" + tarih + ".jpeg";
+        try {
+            FileUtils.copyFile(element.getScreenshotAs(OutputType.FILE),new File(dosyaYolu));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
