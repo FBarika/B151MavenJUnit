@@ -1,4 +1,4 @@
-package ssg.day01;
+package ssg.day01_getKomutlari;
 
 import techproed.utilities.TestBase;
 

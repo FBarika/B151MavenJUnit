@@ -1,9 +1,13 @@
 package techproed.utilities;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -12,6 +16,9 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -21,6 +28,11 @@ import java.util.Date;
 import java.util.List;
 
 public class TestBase {
+    protected ExtentReports extentReports;//--> Raporlamayi baslatmak icin kullanilan class
+    protected ExtentHtmlReporter extentHtmlReporter;//--> Raporu HTML formatinda düzenler.
+    protected ExtentTest extentTest;//--> Test adimlarinda eklemek istedigimiz bilgileri bu class ile olustururuz.
+    //protected yapma sebebimiz farkli package larda da kullanabilmek icin yaptik.
+
     /*
     TestBase class'indan obje olusturmanin önüne gecmek icin bu classi abstract yapabiliriz.
     TestBase testbase = new TestBase(); yani bu sekilde obje olusturmanin önüne gecmis oluruz.
@@ -39,6 +51,8 @@ public class TestBase {
 
     @After
     public void tearDown() throws Exception {
+        extentReports=new ExtentReports();//flush() methodunu kullanavilmesi icin atamasini yapmamiz gerekiyor.Burada atama yaptik.
+        extentReports.flush();
        // driver.quit();
     }
 
@@ -165,9 +179,87 @@ public class TestBase {
         }
     }
 
+    //UploadFile Robot Class
+    public void uploadFilePath(String filePath) {
+        try {
+            bekle(3);
+            StringSelection stringSelection = new StringSelection(filePath);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            bekle(3);
+            robot.keyPress(KeyEvent.VK_V);
+            bekle(3);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            bekle(3);
+            robot.keyRelease(KeyEvent.VK_V);
+            bekle(3);
+            robot.keyPress(KeyEvent.VK_ENTER);
+            bekle(3);
+            robot.keyRelease(KeyEvent.VK_ENTER);
+            bekle(3);
+        } catch (AWTException e) {
+            throw new RuntimeException(e);
+        }
+    }// sendKeys() methodu ile upload yapamadigimiz zamanlar icin ise yarayacak bir method.
+
+    //Extent Report Methodu
+    public void extentReport(String browser,String reportName){
+        extentReports = new ExtentReports();
+        String tarih = new SimpleDateFormat("_hh_mm_ss_ddMMyyyy").format(new Date());
+        String dosyaYolu = "testOutput/extentReports/extentReport"+tarih+".html";
+        extentHtmlReporter = new ExtentHtmlReporter(dosyaYolu);
+        extentReports.attachReporter(extentHtmlReporter);//--> HTML formatinda raporlamayi baslatacak.
+
+        //Raporda gözükmesini istedigimiz icin bilgiler icin
+        extentReports.setSystemInfo("Browser",browser);
+        extentReports.setSystemInfo("Tester","Barika");
+        extentHtmlReporter.config().setDocumentTitle("Extent Report");
+        extentHtmlReporter.config().setReportName(reportName);
 
 
+    }
+
+    //Click Method
+    public void click(WebElement element){
+        try {
+            element.click();
+        } catch (Exception e) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].click()",element);
+        }
+    }
+
+    //JS Scroll WE Method
+    public void jsScrollWE(WebElement element){
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].scrollIntoView(true);",element);
+    }
+
+    //JS Scroll END Method(Sayfanin altina)
+    public void scrollEnd(){
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.scrollTo(0,document.body.scrollHeight)");
+    }
+
+    //JS Scroll HOME Method(Sayfanin üstüne)
+    public void scrollHome(){
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.scrollTo(0,-document.body.scrollHeight)");
+    }
+
+    //JS SendKeys() Method
+    public void jsSendKeys(String text,WebElement element){
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].value='"+text+"'",element);
+    }
+
+    //JS setAttribute() Method
+    public void jsSetAttribute(String attribute,String text,WebElement element){
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].setAttribute('"+attribute+"','"+text+"')",element);
 
 
+    }
 
 }
